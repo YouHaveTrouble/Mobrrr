@@ -9,11 +9,11 @@
     <Appenders>
 
         <Console name="ConsoleTerminal" target="SYSTEM_OUT" follow="true">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%p]: %msg%n"/>
         </Console>
 
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz" immediateFlush="false">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%t/%p]: %msg%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
                 <OnStartupTriggeringPolicy/>

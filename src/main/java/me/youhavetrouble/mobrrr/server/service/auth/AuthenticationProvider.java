@@ -1,4 +1,4 @@
-package me.youhavetrouble.mobrrr.auth;
+package me.youhavetrouble.mobrrr.server.service.auth;
 
 public interface AuthenticationProvider {
 
