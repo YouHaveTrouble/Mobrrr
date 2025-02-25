@@ -1,6 +1,8 @@
 package me.youhavetrouble.mobrrr.server.service.player;
 
 
+import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
+import me.youhavetrouble.mobrrr.packet.Packet;
 import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
 import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
 import org.slf4j.Logger;
@@ -72,9 +74,6 @@ public class Connection extends Thread {
             while (running) {
                 byte packetId = dataInputStream.readByte();
                 switch (packetId) {
-                    case 1 -> {
-
-                    }
                     default -> logger.error("Unknown packet id {}", packetId);
                 }
             }
@@ -90,8 +89,8 @@ public class Connection extends Thread {
 
     }
 
-    private void handleLoginPacket(DataInputStream dataInputStream) {
-
+    public void sendPacket(OutgoingPacket packet) throws IOException {
+        packet.write(dataOutputStream);
     }
 
     public enum Phase {

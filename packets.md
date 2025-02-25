@@ -27,7 +27,51 @@ Packet IDs are 1 byte long.
             <td>Token</td>
         </tr>
     </tbody>
-
 </table>
 
 # Clientbound Packets
+
+## Spawn entity
+
+### ID: `1`
+
+### Content
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Integer</td>
+            <td>Entity type id</td>
+        </tr>
+        <tr>
+            <td>Integer</td>
+            <td>Entity instance id</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>X position of entity</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>Y position of entity</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>Height position of entity</td>
+        </tr>
+        <tr>
+            <td>Integer</td>
+            <td>Length of extra data</td>
+        </tr>
+        <tr>
+            <td>Byte[]</td>
+            <td>Extra data</td>
+        </tr>
+    </tbody>
+</table>
