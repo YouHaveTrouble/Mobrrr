@@ -75,3 +75,77 @@ Packet IDs are 1 byte long.
         </tr>
     </tbody>
 </table>
+
+## Despawn entity
+
+### ID: `2`
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Integer</td>
+            <td>Entity instance id</td>
+        </tr>
+    </tbody>
+</table>
+
+## Update entity
+
+### ID: `3`
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Integer</td>
+            <td>Entity instance id</td>
+        </tr>
+        <tr>
+            <td>Integer</td>
+            <td>Length of extra data</td>
+        </tr>
+        <tr>
+            <td>Byte[]</td>
+            <td>Extra data</td>
+        </tr>
+    </tbody>
+</table>
+
+## Move entity
+
+### ID: `4`
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Integer</td>
+            <td>Entity instance id</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>X position of entity</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>Y position of entity</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>Height position of entity</td>
+        </tr>
+    </tbody>
+</table>

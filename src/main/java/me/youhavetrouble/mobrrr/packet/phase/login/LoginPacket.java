@@ -19,7 +19,7 @@ public class LoginPacket extends IncomingPacket {
     }
 
     @Override
-    public int getId() {
+    public byte getId() {
         return 0;
     }
 }

@@ -17,4 +17,9 @@ public class PositionWithHeight extends Position {
         this.height = height;
     }
 
+    @Override
+    public PositionWithHeight clone() {
+        return new PositionWithHeight(getX(), getY(), height);
+    }
+
 }

@@ -2,7 +2,6 @@ package me.youhavetrouble.mobrrr.server.service.player;
 
 
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
-import me.youhavetrouble.mobrrr.packet.Packet;
 import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
 import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
 import org.slf4j.Logger;
@@ -90,7 +89,9 @@ public class Connection extends Thread {
     }
 
     public void sendPacket(OutgoingPacket packet) throws IOException {
+        dataOutputStream.writeByte(packet.getId());
         packet.write(dataOutputStream);
+        dataOutputStream.flush();
     }
 
     public enum Phase {
