@@ -22,12 +22,12 @@ public class MobaServer {
     private int connectionId = 0;
 
     public final AuthenticationProvider authenticationProvider;
-    public final PlayerProvider<? extends Player, ? extends PlayerProviderData> playerProvider;
+    public final PlayerProvider<?, ? extends Player, ? extends PlayerProviderData> playerProvider;
 
     public MobaServer(
             @NotNull InetSocketAddress address,
             @NotNull AuthenticationProvider authenticationProvider,
-            @NotNull PlayerProvider<? extends Player, ? extends PlayerProviderData> playerProvider
+            @NotNull PlayerProvider<?, ? extends Player, ? extends PlayerProviderData> playerProvider
     ) {
         this.address = address;
         this.authenticationProvider = authenticationProvider;
@@ -46,9 +46,15 @@ public class MobaServer {
 
             while (running) {
                 Socket socket = serverSocket.accept();
-                factory.newThread(new Connection(socket, ++connectionId, authenticationProvider)).start();
+                factory.newThread(
+                        new Connection(
+                                socket,
+                                ++connectionId,
+                                authenticationProvider,
+                                playerProvider
+                        )
+                ).start();
             }
-
             serverSocket.close();
         } catch (IOException e) {
             throw new RuntimeException(e);

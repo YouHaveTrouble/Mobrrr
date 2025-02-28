@@ -4,6 +4,8 @@ package me.youhavetrouble.mobrrr.server.service.player;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
 import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
 import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +26,18 @@ public class Connection extends Thread {
     private DataInputStream dataInputStream;
 
     private final AuthenticationProvider authenticationProvider;
+    private final PlayerProvider<?, ?, ?> playerProvider;
     private final Logger logger;
 
-    public Connection(Socket socket, int id, AuthenticationProvider authenticationProvider) {
+    private Player player;
+
+    public Connection(Socket socket, int id, AuthenticationProvider authenticationProvider, PlayerProvider<?, ?, ?> playerProvider) {
         super("Connection");
         this.id = id;
         this.socket = socket;
         this.logger = LoggerFactory.getLogger("Connection-" + id);
         this.authenticationProvider = authenticationProvider;
+        this.playerProvider = playerProvider;
     }
 
     @Override
@@ -41,54 +47,89 @@ public class Connection extends Thread {
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
         ) {
-
             this.dataOutputStream = dataOutputStream;
             this.dataInputStream = dataInputStream;
 
-            if (this.phase == Phase.LOGIN) {
-                socket.setSoTimeout(3000);
-                byte packetId = dataInputStream.readByte();
-                if (packetId != 0) {
-                    logger.warn("Expected authentication packet, got packet with id {}", packetId);
-                    socket.close();
-                    return;
-                }
-                LoginPacket loginPacket = new LoginPacket(dataInputStream);
-                if (authenticationProvider.authenticate(loginPacket.getToken())) {
-                    socket.setKeepAlive(true);
-                    socket.setTcpNoDelay(true);
-                    this.phase = Phase.PLAY;
-                    logger.info("Authenticated successfully");
-                    // TODO assign to player object
-
-                } else {
-                    logger.error("Authentication failed");
-                    this.running = false;
-                    socket.close();
-                }
-            }
-
-            socket.setSoTimeout(60 * 1000);
+            // connect token to player and assign connection to player
+            if (this.phase == Phase.LOGIN && !handleLoginPhase()) this.running = false;
 
             while (running) {
-                byte packetId = dataInputStream.readByte();
-                switch (packetId) {
-                    default -> logger.error("Unknown packet id {}", packetId);
-                }
+                handlePlayPhasePacket();
             }
-
             socket.close();
-
         } catch (SocketTimeoutException e) {
             logger.error("Connection {} timed out", id);
         } catch (IOException e) {
             logger.error("Error while handling connection", e);
+        } finally {
+            if (this.player != null) this.player.setConnection(null);
+        }
+    }
+
+    private boolean handleLoginPhase() throws IOException {
+        socket.setSoTimeout(3000);
+        byte packetId = dataInputStream.readByte();
+        if (packetId != 0) {
+            logger.warn("Expected authentication packet, got packet with id {}", packetId);
+            return false;
+        }
+        LoginPacket loginPacket = new LoginPacket(dataInputStream);
+        if (!authenticationProvider.authenticate(loginPacket.getToken())) {
+            logger.info("Authentication failed");
+            return false;
+        }
+        logger.info("Authenticated successfully");
+        socket.setSoTimeout(60 * 1000); // lenghten timeout after login
+        socket.setKeepAlive(true);
+
+        Object playerId = this.playerProvider.matchPlayerIdFromToken(loginPacket.getToken());
+        if (playerId == null) {
+            logger.error("Could not match any registered players from the token. This is an implementation issue!");
+            return false;
+        }
+
+        this.player = getPlayer(playerProvider, playerId);
+        if (this.player == null) {
+            logger.error("Could not find player with id {}. This is an implementation issue!", playerId);
+            return false;
         }
 
 
+
+        logger.debug("Switching to play phase");
+        this.phase = Phase.PLAY;
+
+        Connection oldConnection = this.player.getConnection();
+        if (oldConnection != null) oldConnection.disconnect();
+        this.player.setConnection(this);
+        return true;
     }
 
-    public void sendPacket(OutgoingPacket packet) throws IOException {
+    private void handlePlayPhasePacket() throws IOException {
+        byte packetId = dataInputStream.readByte();
+        switch (packetId) {
+            default -> logger.warn("Unknown packet id {}", packetId);
+        }
+    }
+
+    private <I> @Nullable Player getPlayer(@NotNull PlayerProvider<I, ?, ?> playerProvider, @NotNull Object playerId) {
+        try {
+            return playerProvider.getPlayer((I) playerId);
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    public void disconnect() {
+        this.running = false;
+        try {
+            socket.close();
+        } catch (IOException e) {
+            logger.error("Error while closing socket", e);
+        }
+    }
+
+    public void sendPacket(@NotNull OutgoingPacket packet) throws IOException {
         dataOutputStream.writeByte(packet.getId());
         packet.write(dataOutputStream);
         dataOutputStream.flush();
