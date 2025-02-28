@@ -29,6 +29,31 @@ Packet IDs are 1 byte long.
     </tbody>
 </table>
 
+## Move to position
+
+### ID: `1`
+
+### Content
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Double</td>
+            <td>X position of target</td>
+        </tr>
+        <tr>
+            <td>Double</td>
+            <td>Y position of target</td>
+        </tr>
+    </tbody>
+</table>
+
 # Clientbound Packets
 
 ## Spawn entity

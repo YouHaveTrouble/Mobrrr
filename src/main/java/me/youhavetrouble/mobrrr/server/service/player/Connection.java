@@ -1,8 +1,10 @@
 package me.youhavetrouble.mobrrr.server.service.player;
 
 
+import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
 import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
+import me.youhavetrouble.mobrrr.packet.phase.play.MoveToPositionPacket;
 import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,11 +13,17 @@ import org.slf4j.LoggerFactory;
 
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Map;
 
 
 public class Connection extends Thread {
+
+    public static final Map<Byte, Class<? extends IncomingPacket>> INCOMING_PACKETS = Map.of(
+            (byte) 1, MoveToPositionPacket.class
+    );
 
     public final int id;
     public final Socket socket;
@@ -59,7 +67,7 @@ public class Connection extends Thread {
             socket.close();
         } catch (SocketTimeoutException e) {
             logger.error("Connection {} timed out", id);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Error while handling connection", e);
         } finally {
             if (this.player != null) this.player.setConnection(null);
@@ -74,7 +82,7 @@ public class Connection extends Thread {
             return false;
         }
         LoginPacket loginPacket = new LoginPacket(dataInputStream);
-        if (!authenticationProvider.authenticate(loginPacket.getToken())) {
+        if (!authenticationProvider.authenticate(loginPacket.token)) {
             logger.info("Authentication failed");
             return false;
         }
@@ -82,7 +90,7 @@ public class Connection extends Thread {
         socket.setSoTimeout(60 * 1000); // lenghten timeout after login
         socket.setKeepAlive(true);
 
-        Object playerId = this.playerProvider.matchPlayerIdFromToken(loginPacket.getToken());
+        Object playerId = this.playerProvider.matchPlayerIdFromToken(loginPacket.token);
         if (playerId == null) {
             logger.error("Could not match any registered players from the token. This is an implementation issue!");
             return false;
@@ -105,11 +113,19 @@ public class Connection extends Thread {
         return true;
     }
 
-    private void handlePlayPhasePacket() throws IOException {
+    private void handlePlayPhasePacket() throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         byte packetId = dataInputStream.readByte();
-        switch (packetId) {
-            default -> logger.warn("Unknown packet id {}", packetId);
+
+        Class<? extends IncomingPacket> packetClass = INCOMING_PACKETS.get(packetId);
+
+        if (packetClass == null) {
+            logger.warn("Unknown packet id {}", packetId);
+            throw new IOException("Unknown packet id " + packetId);
         }
+
+        IncomingPacket incomingPacket = packetClass.getConstructor(DataInputStream.class).newInstance(this.dataInputStream);
+        // TODO pass to event system
+
     }
 
     private <I> @Nullable Player getPlayer(@NotNull PlayerProvider<I, ?, ?> playerProvider, @NotNull Object playerId) {
