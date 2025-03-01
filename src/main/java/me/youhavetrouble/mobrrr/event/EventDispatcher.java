@@ -8,7 +8,10 @@ public class EventDispatcher {
 
     private final Map<Class<? extends Event>, List<EventHandler<? extends Event>>> eventHandlers = new HashMap<>();
 
-    public void registerEventHandler(@NotNull Class<? extends Event> eventType, @NotNull EventHandler<? extends Event> eventHandler) {
+    public <E extends Event> void registerEventHandler(
+            @NotNull Class<E> eventType,
+            @NotNull EventHandler<E> eventHandler
+    ) {
         eventHandlers.computeIfAbsent(eventType, k -> new ArrayList<>()).add(eventHandler);
     }
 
