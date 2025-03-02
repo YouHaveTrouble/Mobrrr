@@ -10,14 +10,21 @@ import java.util.Map;
 
 public class DummyPlayerProvider extends PlayerProvider<String, DummyPlayer, DummyPlayerProviderData> {
 
-    public static final Map<String, DummyPlayer> players = Map.of(
-            "player1", new DummyPlayer(new DummyPlayerProviderData("player1")),
-            "player2", new DummyPlayer(new DummyPlayerProviderData("player2")),
-            "player3", new DummyPlayer(new DummyPlayerProviderData("player3")),
-            "player4", new DummyPlayer(new DummyPlayerProviderData("player4")),
-            "player5", new DummyPlayer(new DummyPlayerProviderData("player5")),
-            "player6", new DummyPlayer(new DummyPlayerProviderData("player6"))
+    public static final Map<String, DummyPlayerProviderData> players = Map.of(
+            "player1", new DummyPlayerProviderData("player1"),
+            "player2", new DummyPlayerProviderData("player2"),
+            "player3", new DummyPlayerProviderData("player3"),
+            "player4", new DummyPlayerProviderData("player4"),
+            "player5", new DummyPlayerProviderData("player5"),
+            "player6", new DummyPlayerProviderData("player6")
     );
+
+    public DummyPlayerProvider() {
+        for (DummyPlayerProviderData data : players.values()) {
+            DummyPlayer dummyPlayer = createPlayer(data);
+            registerPlayer(data.name, dummyPlayer);
+        }
+    }
 
     @Override
     public DummyPlayer createPlayer(DummyPlayerProviderData data) {
@@ -26,8 +33,7 @@ public class DummyPlayerProvider extends PlayerProvider<String, DummyPlayer, Dum
 
     @Override
     public @Nullable String matchPlayerIdFromToken(String token) {
-        DummyPlayer dummyPlayer = players.get(token);
-        return dummyPlayer == null ? null : dummyPlayer.name;
+        return getPlayer(token) == null ? null : token;
     }
 
 }

@@ -10,8 +10,7 @@ public class LoginPacket extends IncomingPacket {
     public final String token;
 
     public LoginPacket(DataInputStream dataInputStream) throws IOException {
-        int tokenLength = Math.min(dataInputStream.readShort(), 512);
-        this.token = new String(dataInputStream.readNBytes(tokenLength));
+        this.token = dataInputStream.readUTF();
     }
 
     @Override

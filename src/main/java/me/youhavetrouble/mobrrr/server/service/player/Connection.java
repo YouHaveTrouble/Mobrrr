@@ -1,16 +1,15 @@
 package me.youhavetrouble.mobrrr.server.service.player;
 
 
+import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
 import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
 import me.youhavetrouble.mobrrr.packet.phase.play.MoveToPositionPacket;
-import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
+import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -28,29 +27,29 @@ public class Connection extends Thread {
     public final int id;
     public final Socket socket;
     private Phase phase = Phase.LOGIN;
-    private boolean running = true;
 
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
 
-    private final AuthenticationProvider authenticationProvider;
-    private final PlayerProvider<?, ?, ?> playerProvider;
+    private final EventDispatcher eventDispatcher;
     private final Logger logger;
 
     private Player player;
 
-    public Connection(Socket socket, int id, AuthenticationProvider authenticationProvider, PlayerProvider<?, ?, ?> playerProvider) {
+    public Connection(
+            Socket socket,
+            int id,
+            EventDispatcher eventDispatcher
+    ) {
         super("Connection");
         this.id = id;
         this.socket = socket;
-        this.logger = LoggerFactory.getLogger("Connection-" + id);
-        this.authenticationProvider = authenticationProvider;
-        this.playerProvider = playerProvider;
+        this.logger = LoggerFactory.getLogger(this.getClass());
+        this.eventDispatcher = eventDispatcher;
     }
 
     @Override
     public void run() {
-
         try (
                 DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                 DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
@@ -59,14 +58,18 @@ public class Connection extends Thread {
             this.dataInputStream = dataInputStream;
 
             // connect token to player and assign connection to player
-            if (this.phase == Phase.LOGIN && !handleLoginPhase()) this.running = false;
+            if (this.phase == Phase.LOGIN) {
+                handleLoginPhase();
+            }
 
-            while (running) {
+            while (phase == Phase.PLAY) {
                 handlePlayPhasePacket();
             }
             socket.close();
         } catch (SocketTimeoutException e) {
-            logger.error("Connection {} timed out", id);
+            logger.warn("Connection timed out");
+        } catch (EOFException e) {
+            logger.info("Connection closed by client");
         } catch (Exception e) {
             logger.error("Error while handling connection", e);
         } finally {
@@ -74,43 +77,40 @@ public class Connection extends Thread {
         }
     }
 
-    private boolean handleLoginPhase() throws IOException {
+    private void handleLoginPhase() throws IOException {
         socket.setSoTimeout(3000);
         byte packetId = dataInputStream.readByte();
         if (packetId != 0) {
             logger.warn("Expected authentication packet, got packet with id {}", packetId);
-            return false;
+            this.disconnect();
+            return;
         }
         LoginPacket loginPacket = new LoginPacket(dataInputStream);
-        if (!authenticationProvider.authenticate(loginPacket.token)) {
+        LoginPacketEvent loginPacketEvent = new LoginPacketEvent(this, loginPacket);
+        this.eventDispatcher.dispatchEvent(loginPacketEvent);
+
+        if (!loginPacketEvent.isAuthenticated()) {
             logger.info("Authentication failed");
-            return false;
+            this.disconnect();
+            return;
         }
         logger.info("Authenticated successfully");
-        socket.setSoTimeout(60 * 1000); // lenghten timeout after login
+        socket.setSoTimeout(0);
         socket.setKeepAlive(true);
 
-        Object playerId = this.playerProvider.matchPlayerIdFromToken(loginPacket.token);
-        if (playerId == null) {
-            logger.error("Could not match any registered players from the token. This is an implementation issue!");
-            return false;
-        }
-
-        this.player = getPlayer(playerProvider, playerId);
+        this.player = loginPacketEvent.getResolvedPlayer();
         if (this.player == null) {
-            logger.error("Could not find player with id {}. This is an implementation issue!", playerId);
-            return false;
+            logger.error("Could not resolve player from login token. This is auth/player resolver implementation error");
+            this.disconnect();
+            return;
         }
 
-
-
-        logger.debug("Switching to play phase");
+        logger.debug("Player resolved. Switching to play phase");
         this.phase = Phase.PLAY;
 
         Connection oldConnection = this.player.getConnection();
         if (oldConnection != null) oldConnection.disconnect();
         this.player.setConnection(this);
-        return true;
     }
 
     private void handlePlayPhasePacket() throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -128,16 +128,12 @@ public class Connection extends Thread {
 
     }
 
-    private <I> @Nullable Player getPlayer(@NotNull PlayerProvider<I, ?, ?> playerProvider, @NotNull Object playerId) {
-        try {
-            return playerProvider.getPlayer((I) playerId);
-        } catch (ClassCastException e) {
-            return null;
-        }
-    }
+
 
     public void disconnect() {
-        this.running = false;
+        logger.info("Disconnecting");
+        this.phase = Phase.DISCONNECTED;
+        if (this.player != null) this.player.setConnection(null);
         try {
             socket.close();
         } catch (IOException e) {
@@ -153,7 +149,8 @@ public class Connection extends Thread {
 
     public enum Phase {
         LOGIN,
-        PLAY
+        PLAY,
+        DISCONNECTED
     }
 
 }

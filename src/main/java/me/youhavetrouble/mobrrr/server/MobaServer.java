@@ -1,5 +1,8 @@
 package me.youhavetrouble.mobrrr.server;
 
+import me.youhavetrouble.mobrrr.event.EventDispatcher;
+import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
+import me.youhavetrouble.mobrrr.server.handler.LoginPacketEventHandler;
 import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
 import me.youhavetrouble.mobrrr.server.service.player.Connection;
 import me.youhavetrouble.mobrrr.server.service.player.Player;
@@ -24,6 +27,8 @@ public class MobaServer {
     public final AuthenticationProvider authenticationProvider;
     public final PlayerProvider<?, ? extends Player, ? extends PlayerProviderData> playerProvider;
 
+    private final EventDispatcher serverEventDispatcher = new EventDispatcher();
+
     public MobaServer(
             @NotNull InetSocketAddress address,
             @NotNull AuthenticationProvider authenticationProvider,
@@ -32,13 +37,15 @@ public class MobaServer {
         this.address = address;
         this.authenticationProvider = authenticationProvider;
         this.playerProvider = playerProvider;
+
+        serverEventDispatcher.registerEventHandler(LoginPacketEvent.class, new LoginPacketEventHandler(authenticationProvider, playerProvider));
     }
 
     public void start() {
         if (running) throw new IllegalStateException("Server is already running");
         this.running = true;
 
-        ThreadFactory factory = Thread.ofVirtual().name("Socket").factory();
+        ThreadFactory factory = Thread.ofVirtual().factory();
 
         try {
             this.serverSocket = new ServerSocket(address.getPort(), 50);
@@ -46,14 +53,15 @@ public class MobaServer {
 
             while (running) {
                 Socket socket = serverSocket.accept();
-                factory.newThread(
+                Thread thread = factory.newThread(
                         new Connection(
                                 socket,
                                 ++connectionId,
-                                authenticationProvider,
-                                playerProvider
+                                serverEventDispatcher
                         )
-                ).start();
+                );
+                thread.setName("Connection-"+connectionId);
+                thread.start();
             }
             serverSocket.close();
         } catch (IOException e) {

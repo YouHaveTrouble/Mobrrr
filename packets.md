@@ -20,7 +20,7 @@ Packet IDs are 1 byte long.
     <tbody>
         <tr>
             <td>Short</td>
-            <td>Length of the token</td>
+            <td>Length of the token in bytes</td>
         </tr>
         <tr>
             <td>String</td>
