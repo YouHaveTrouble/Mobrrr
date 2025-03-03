@@ -1,6 +1,6 @@
 package me.youhavetrouble.mobrrr.server.handler;
 
-import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
+import me.youhavetrouble.mobrrr.packet.serverbound.LoginPacket;
 import me.youhavetrouble.mobrrr.server.service.player.Connection;
 import me.youhavetrouble.mobrrr.server.service.player.Player;
 import org.jetbrains.annotations.Nullable;

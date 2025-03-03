@@ -1,4 +1,4 @@
-package me.youhavetrouble.mobrrr.packet.phase.login;
+package me.youhavetrouble.mobrrr.packet.serverbound;
 
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 

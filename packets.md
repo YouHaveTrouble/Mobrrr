@@ -56,6 +56,39 @@ Packet IDs are 1 byte long.
 
 # Clientbound Packets
 
+## Disconnect
+
+Server is expected to disconnect right after sending this packet.
+
+### ID: `0`
+
+### Content
+
+<table>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Short</td>
+            <td>Length of the reason in bytes</td>
+        </tr>
+        <tr>
+            <td>String</td>
+            <td>Reason</td>
+        </tr>
+    </tbody>
+</table>
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+I am not sure if following packets will stay as engine-level packets or will be removed and implementations can decide to add them back.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 ## Spawn entity
 
 ### ID: `1`

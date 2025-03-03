@@ -4,10 +4,12 @@ package me.youhavetrouble.mobrrr.server.service.player;
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
-import me.youhavetrouble.mobrrr.packet.phase.login.LoginPacket;
-import me.youhavetrouble.mobrrr.packet.phase.play.MoveToPositionPacket;
+import me.youhavetrouble.mobrrr.packet.clientbound.KickPacket;
+import me.youhavetrouble.mobrrr.packet.serverbound.LoginPacket;
+import me.youhavetrouble.mobrrr.packet.clientbound.MoveToPositionPacket;
 import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +84,7 @@ public class Connection extends Thread {
         byte packetId = dataInputStream.readByte();
         if (packetId != 0) {
             logger.warn("Expected authentication packet, got packet with id {}", packetId);
-            this.disconnect();
+            this.disconnect("Expected authentication packet");
             return;
         }
         LoginPacket loginPacket = new LoginPacket(dataInputStream);
@@ -91,7 +93,7 @@ public class Connection extends Thread {
 
         if (!loginPacketEvent.isAuthenticated()) {
             logger.info("Authentication failed");
-            this.disconnect();
+            this.disconnect("Authentication failed");
             return;
         }
         logger.info("Authenticated successfully");
@@ -109,7 +111,7 @@ public class Connection extends Thread {
         this.phase = Phase.PLAY;
 
         Connection oldConnection = this.player.getConnection();
-        if (oldConnection != null) oldConnection.disconnect();
+        if (oldConnection != null) oldConnection.disconnect("Logged in from another location");
         this.player.setConnection(this);
     }
 
@@ -130,15 +132,20 @@ public class Connection extends Thread {
 
 
 
-    public void disconnect() {
+    public void disconnect(@Nullable String reason) {
         logger.info("Disconnecting");
         this.phase = Phase.DISCONNECTED;
         if (this.player != null) this.player.setConnection(null);
         try {
+            sendPacket(new KickPacket(reason));
             socket.close();
         } catch (IOException e) {
             logger.error("Error while closing socket", e);
         }
+    }
+
+    public void disconnect() {
+        disconnect(null);
     }
 
     public void sendPacket(@NotNull OutgoingPacket packet) throws IOException {

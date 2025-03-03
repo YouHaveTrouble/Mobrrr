@@ -1,4 +1,4 @@
-package me.youhavetrouble.mobrrr.packet.phase.play;
+package me.youhavetrouble.mobrrr.packet.clientbound;
 
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.server.game.Position;
