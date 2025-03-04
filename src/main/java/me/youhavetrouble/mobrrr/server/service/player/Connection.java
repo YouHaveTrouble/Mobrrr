@@ -4,10 +4,12 @@ package me.youhavetrouble.mobrrr.server.service.player;
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
+import me.youhavetrouble.mobrrr.packet.Packet;
 import me.youhavetrouble.mobrrr.packet.clientbound.KickPacket;
 import me.youhavetrouble.mobrrr.packet.serverbound.LoginPacket;
 import me.youhavetrouble.mobrrr.packet.clientbound.MoveToPositionPacket;
 import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
+import me.youhavetrouble.mobrrr.server.handler.PacketEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -126,11 +128,10 @@ public class Connection extends Thread {
         }
 
         IncomingPacket incomingPacket = packetClass.getConstructor(DataInputStream.class).newInstance(this.dataInputStream);
-        // TODO pass to event system
+        PacketEvent<? extends Packet> packetEvent = new PacketEvent<>(this, incomingPacket);
+        eventDispatcher.dispatchEvent(packetEvent);
 
     }
-
-
 
     public void disconnect(@Nullable String reason) {
         logger.info("Disconnecting");
