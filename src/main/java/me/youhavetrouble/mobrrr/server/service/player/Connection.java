@@ -1,13 +1,12 @@
 package me.youhavetrouble.mobrrr.server.service.player;
 
 
-import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
 import me.youhavetrouble.mobrrr.packet.Packet;
 import me.youhavetrouble.mobrrr.packet.clientbound.KickPacket;
 import me.youhavetrouble.mobrrr.packet.serverbound.LoginPacket;
-import me.youhavetrouble.mobrrr.packet.clientbound.MoveToPositionPacket;
+import me.youhavetrouble.mobrrr.server.MobaServer;
 import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
 import me.youhavetrouble.mobrrr.server.handler.PacketEvent;
 import org.jetbrains.annotations.NotNull;
@@ -18,15 +17,11 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Map;
 
 
 public class Connection extends Thread {
-
-    public static final Map<Byte, Class<? extends IncomingPacket>> INCOMING_PACKETS = Map.of(
-            (byte) 1, MoveToPositionPacket.class
-    );
 
     public final int id;
     public final Socket socket;
@@ -35,7 +30,7 @@ public class Connection extends Thread {
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
 
-    private final EventDispatcher eventDispatcher;
+    private final MobaServer server;
     private final Logger logger;
 
     private Player player;
@@ -43,13 +38,13 @@ public class Connection extends Thread {
     public Connection(
             Socket socket,
             int id,
-            EventDispatcher eventDispatcher
+            MobaServer server
     ) {
         super("Connection");
         this.id = id;
         this.socket = socket;
         this.logger = LoggerFactory.getLogger(this.getClass());
-        this.eventDispatcher = eventDispatcher;
+        this.server = server;
     }
 
     @Override
@@ -72,7 +67,10 @@ public class Connection extends Thread {
             socket.close();
         } catch (SocketTimeoutException e) {
             logger.warn("Connection timed out");
-        } catch (EOFException e) {
+        } catch (SocketException e) {
+            logger.info("Connection closed");
+        }
+        catch (EOFException e) {
             logger.info("Connection closed by client");
         } catch (Exception e) {
             logger.error("Error while handling connection", e);
@@ -91,7 +89,7 @@ public class Connection extends Thread {
         }
         LoginPacket loginPacket = new LoginPacket(dataInputStream);
         LoginPacketEvent loginPacketEvent = new LoginPacketEvent(this, loginPacket);
-        this.eventDispatcher.dispatchEvent(loginPacketEvent);
+        this.server.eventDispatcher.dispatchEvent(loginPacketEvent);
 
         if (!loginPacketEvent.isAuthenticated()) {
             logger.info("Authentication failed");
@@ -120,7 +118,7 @@ public class Connection extends Thread {
     private void handlePlayPhasePacket() throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         byte packetId = dataInputStream.readByte();
 
-        Class<? extends IncomingPacket> packetClass = INCOMING_PACKETS.get(packetId);
+        Class<? extends IncomingPacket> packetClass = this.server.packetRegistry.getServerboundPacket(packetId);
 
         if (packetClass == null) {
             logger.warn("Unknown packet id {}", packetId);
@@ -129,7 +127,7 @@ public class Connection extends Thread {
 
         IncomingPacket incomingPacket = packetClass.getConstructor(DataInputStream.class).newInstance(this.dataInputStream);
         PacketEvent<? extends Packet> packetEvent = new PacketEvent<>(this, incomingPacket);
-        eventDispatcher.dispatchEvent(packetEvent);
+        this.server.eventDispatcher.dispatchEvent(packetEvent);
 
     }
 

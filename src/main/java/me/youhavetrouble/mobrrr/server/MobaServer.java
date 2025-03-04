@@ -4,6 +4,7 @@ import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
 import me.youhavetrouble.mobrrr.server.handler.LoginPacketEventHandler;
 import me.youhavetrouble.mobrrr.server.service.auth.AuthenticationProvider;
+import me.youhavetrouble.mobrrr.server.service.packet.PacketRegistry;
 import me.youhavetrouble.mobrrr.server.service.player.Connection;
 import me.youhavetrouble.mobrrr.server.service.player.Player;
 import me.youhavetrouble.mobrrr.server.service.player.PlayerProvider;
@@ -11,7 +12,6 @@ import me.youhavetrouble.mobrrr.server.service.player.PlayerProviderData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.ThreadFactory;
@@ -24,10 +24,12 @@ public class MobaServer {
     private boolean running = false;
     private int connectionId = 0;
 
+    public final PacketRegistry packetRegistry = new PacketRegistry();
+
     public final AuthenticationProvider authenticationProvider;
     public final PlayerProvider<?, ? extends Player, ? extends PlayerProviderData> playerProvider;
 
-    private final EventDispatcher serverEventDispatcher = new EventDispatcher();
+    public final EventDispatcher eventDispatcher = new EventDispatcher();
 
     public MobaServer(
             @NotNull InetSocketAddress address,
@@ -37,13 +39,13 @@ public class MobaServer {
         this.address = address;
         this.authenticationProvider = authenticationProvider;
         this.playerProvider = playerProvider;
-
-        serverEventDispatcher.registerEventHandler(LoginPacketEvent.class, new LoginPacketEventHandler(authenticationProvider, playerProvider));
+        eventDispatcher.registerEventHandler(LoginPacketEvent.class, new LoginPacketEventHandler(authenticationProvider, playerProvider));
     }
 
     public void start() {
         if (running) throw new IllegalStateException("Server is already running");
         this.running = true;
+        this.packetRegistry.freeze();
 
         ThreadFactory factory = Thread.ofVirtual().factory();
 
@@ -57,7 +59,7 @@ public class MobaServer {
                         new Connection(
                                 socket,
                                 ++connectionId,
-                                serverEventDispatcher
+                                this
                         )
                 );
                 thread.setName("Connection-"+connectionId);
