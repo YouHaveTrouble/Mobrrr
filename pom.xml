@@ -6,12 +6,13 @@
 
     <groupId>me.youhavetrouble.mobrrr</groupId>
     <artifactId>Mobrrr</artifactId>
-    <version>0.1.0.0</version>
+    <version>${revision}</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <revision>0.1.0.0</revision>
     </properties>
 
     <build>
