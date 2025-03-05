@@ -1,5 +1,7 @@
 # Mobrrr
 
+[![CodeFactor](https://www.codefactor.io/repository/github/youhavetrouble/mobrrr/badge)](https://www.codefactor.io/repository/github/youhavetrouble/mobrrr)
+
 > [!CAUTION]
 > This project is in early development stage and is not ready for production use. First stable release will be `1.0.0.0`.
 
