@@ -6,16 +6,19 @@ import me.youhavetrouble.mobrrr.server.packet.DummyPacketEvent;
 import me.youhavetrouble.mobrrr.server.packet.DummyPacketEventHandler;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PacketHandlingTest {
 
     @Test
-    public void dispatchAndHandlePacket() {
+    public void dispatchAndHandlePacketEvent() {
         EventDispatcher dispatcher = new EventDispatcher();
         dispatcher.registerEventHandler(DummyPacketEvent.class, new DummyPacketEventHandler());
 
         DummyPacketEvent dummyPacketEvent = new DummyPacketEvent(new DummyPacket(null));
+        assertFalse(dummyPacketEvent.packet.isHandled());
+
         dispatcher.dispatchEvent(dummyPacketEvent);
 
         assertTrue(dummyPacketEvent.packet.isHandled());

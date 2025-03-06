@@ -22,7 +22,7 @@ public class DummyPlayerProvider extends PlayerProvider<String, DummyPlayer, Dum
     public DummyPlayerProvider() {
         for (DummyPlayerProviderData data : players.values()) {
             DummyPlayer dummyPlayer = createPlayer(data);
-            registerPlayer(data.name, dummyPlayer);
+            registerPlayer(data.name(), dummyPlayer);
         }
     }
 

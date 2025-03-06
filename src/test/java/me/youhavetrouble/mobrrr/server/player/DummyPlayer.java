@@ -14,7 +14,7 @@ public class DummyPlayer implements Player {
     private final Set<Entity<?>> trackedEntities = new HashSet<>();
 
     public DummyPlayer(DummyPlayerProviderData data) {
-        this.name = data.name;
+        this.name = data.name();
     }
 
     @Override
