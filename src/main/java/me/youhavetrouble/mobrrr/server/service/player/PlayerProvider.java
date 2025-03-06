@@ -18,21 +18,22 @@ public abstract class PlayerProvider<I, P extends Player, D extends PlayerProvid
     private final Map<I, P> registeredPlayers = new HashMap<>();
 
     /**
-     * Create a player object from the data. This should be a pure function.
+     * Create a player object from the data. All created players should be registered using
+     * {@link #registerPlayer(Object, Player)} so they can be matched later.
      * @param data The data to create the player object from.
      * @return The created player object.
      */
     public abstract P createPlayer(D data);
 
     /**
-     * Get all players registered in the provider. This should be a read-only map.
+     * Get all players registered in the provider. This is a read-only map.
      * @return A map of all players registered in the provider.
      */
-    public @NotNull Map<I, P> getPlayers() {
+    public final @NotNull Map<I, P> getPlayers() {
         return Collections.unmodifiableMap(registeredPlayers);
     }
 
-    public @Nullable P getPlayer(I id) {
+    public final @Nullable P getPlayer(I id) {
         return registeredPlayers.get(id);
     }
 
@@ -42,7 +43,7 @@ public abstract class PlayerProvider<I, P extends Player, D extends PlayerProvid
      * @param player The player object
      * @throws IllegalArgumentException if a player with the same ID is already registered
      */
-    public void registerPlayer(@NotNull I id, @NotNull P player) throws IllegalArgumentException {
+    public final void registerPlayer(@NotNull I id, @NotNull P player) throws IllegalArgumentException {
         if (registeredPlayers.containsKey(id)) {
             throw new IllegalArgumentException("Player with id" + id + " is already registered");
         }
