@@ -1,4 +1,4 @@
-package me.youhavetrouble.mobrrr;
+package me.youhavetrouble.mobrrr.test;
 
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.server.packet.DummyPacket;
