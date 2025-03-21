@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,8 +37,15 @@ public abstract class GameMap {
      * @return the spawned entity
      * @param <T> the type of the entity
      */
-    public <T extends Entity<?>> T spawnEntity(EntityTemplate<T> entityTemplate) {
+    @NotNull
+    public final <T extends Entity<?>> T spawnEntity(@NotNull EntityTemplate<T> entityTemplate) {
         T entity = entityTemplate.createEntity(++entityIdCounter);
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity template returned null entity");
+        }
+        if (entities.containsKey(entity.id)) {
+            throw new IllegalArgumentException("Entity with id " + entity.id + " already exists");
+        }
         entities.put(entity.id, entity);
         eventDispatcher.dispatchEvent(new EntitySpawnEvent<>(entity));
         logger.debug("Spawned entity of type id {} with id {}", entity.typeId, entity.id);
@@ -45,15 +53,19 @@ public abstract class GameMap {
     }
 
     @Nullable
-    public Entity<?> getEntity(int id) {
+    public final Entity<?> getEntity(int id) {
         return entities.get(id);
+    }
+
+    public final Map<Integer, Entity<?>> getEntities() {
+        return Collections.unmodifiableMap(entities);
     }
 
     /**
      * Removes an entity from the map and fires {@link EntityRemoveEvent}
      * @param entity the entity to remove
      */
-    public void removeEntity(@NotNull Entity<?> entity) {
+    public final void removeEntity(@NotNull Entity<?> entity) {
         if (entities.remove(entity.id) != null) {
             eventDispatcher.dispatchEvent(new EntityRemoveEvent<>(entity));
             return;
