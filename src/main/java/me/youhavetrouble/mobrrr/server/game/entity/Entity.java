@@ -11,8 +11,17 @@ public abstract class Entity<T extends EntityTemplate<?>> {
     public final int id;
     public final int typeId;
     public final GameMap gameMap;
-    private final PositionWithHeight position;
+    private PositionWithHeight position;
 
+    /**
+     * This constructor should not be used directly, it's called by {@link EntityTemplate#createEntity(int)} within the
+     * {@link GameMap#spawnEntity(EntityTemplate)}
+     *
+     * @param id This id needs to be passed to the super constructor for tracking to work properly.
+     * @param typeId Number identifying the type of the entity for network serialization
+     * @param gameMap The map the entity is on
+     * @param position The position of the entity
+     */
     public Entity(
             int id,
             int typeId,
@@ -33,9 +42,9 @@ public abstract class Entity<T extends EntityTemplate<?>> {
         return position;
     }
 
+    // FIXME probably needs to accept position with height
     public void setPosition(Position position) {
-        this.position.setX(position.getX());
-        this.position.setY(position.getY());
+        this.position = new PositionWithHeight(position.getX(), position.getY(), 0);
     }
 
     public void tick() {
