@@ -2,8 +2,8 @@ package me.youhavetrouble.mobrrr.server.game;
 
 public class Position {
 
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     public Position(double x, double y) {
         this.x = x;
@@ -16,14 +16,6 @@ public class Position {
 
     public double getY() {
         return y;
-    }
-
-    public void setX(double x) {
-        this.x = x;
-    }
-
-    public void setY(double y) {
-        this.y = y;
     }
 
     public double distanceTo(Position other) {
