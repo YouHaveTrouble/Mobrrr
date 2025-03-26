@@ -2,19 +2,20 @@ package me.youhavetrouble.mobrrr.server.game;
 
 public class PositionWithHeight extends Position {
 
-    private double height;
+    private final double height;
 
     public PositionWithHeight(double x, double y, double height) {
         super(x, y);
         this.height = height;
     }
 
-    public double getHeight() {
-        return height;
+    public PositionWithHeight(Position position, double height) {
+        super(position.getX(), position.getY());
+        this.height = height;
     }
 
-    public void setHeight(double height) {
-        this.height = height;
+    public double getHeight() {
+        return height;
     }
 
     @Override
