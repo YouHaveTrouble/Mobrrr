@@ -29,31 +29,6 @@ Packet IDs are 1 byte long.
     </tbody>
 </table>
 
-## Move to position
-
-### ID: `1`
-
-### Content
-
-<table>
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Double</td>
-            <td>X position of target</td>
-        </tr>
-        <tr>
-            <td>Double</td>
-            <td>Y position of target</td>
-        </tr>
-    </tbody>
-</table>
-
 # Clientbound Packets
 
 ## Disconnect
@@ -82,12 +57,6 @@ Server is expected to disconnect right after sending this packet.
         </tr>
     </tbody>
 </table>
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-I am not sure if following packets will stay as engine-level packets or will be removed and implementations can decide to add them back.
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ## Spawn entity
 

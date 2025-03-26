@@ -6,11 +6,11 @@ import org.jetbrains.annotations.Nullable;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public final class KickPacket extends OutgoingPacket {
+public final class DisconnectPacket extends OutgoingPacket {
 
     public final String reason;
 
-    public KickPacket(@Nullable String reason) {
+    public DisconnectPacket(@Nullable String reason) {
         if (reason != null && reason.length() > Short.MAX_VALUE) {
             throw new IllegalArgumentException("Kick reason is too long. Should be at most " + Short.MAX_VALUE + " characters.");
         }

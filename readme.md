@@ -15,7 +15,7 @@ In no particular order:
 
 - [x] Packet handling system
 - [x] Event system
-- [ ] Entity system
+- [x] Entity system
 - [ ] Vision system
 - [ ] Map object and collision system
 - [ ] 2D plane navigation/pathfinding system

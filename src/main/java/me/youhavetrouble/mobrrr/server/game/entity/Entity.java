@@ -1,7 +1,6 @@
 package me.youhavetrouble.mobrrr.server.game.entity;
 
 import me.youhavetrouble.mobrrr.server.game.GameMap;
-import me.youhavetrouble.mobrrr.server.game.Position;
 import me.youhavetrouble.mobrrr.server.game.PositionWithHeight;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,9 +41,8 @@ public abstract class Entity<T extends EntityTemplate<?>> {
         return position;
     }
 
-    // FIXME probably needs to accept position with height
-    public void setPosition(Position position) {
-        this.position = new PositionWithHeight(position.getX(), position.getY(), 0);
+    public void setPosition(PositionWithHeight position) {
+        this.position = position.clone();
     }
 
     public void tick() {

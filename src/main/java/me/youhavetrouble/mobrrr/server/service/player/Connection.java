@@ -4,7 +4,7 @@ package me.youhavetrouble.mobrrr.server.service.player;
 import me.youhavetrouble.mobrrr.packet.IncomingPacket;
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
 import me.youhavetrouble.mobrrr.packet.Packet;
-import me.youhavetrouble.mobrrr.packet.clientbound.KickPacket;
+import me.youhavetrouble.mobrrr.packet.clientbound.DisconnectPacket;
 import me.youhavetrouble.mobrrr.packet.serverbound.LoginPacket;
 import me.youhavetrouble.mobrrr.server.MobaServer;
 import me.youhavetrouble.mobrrr.server.handler.LoginPacketEvent;
@@ -136,7 +136,7 @@ public class Connection extends Thread {
         this.phase = Phase.DISCONNECTED;
         if (this.player != null) this.player.setConnection(null);
         try {
-            sendPacket(new KickPacket(reason));
+            sendPacket(new DisconnectPacket(reason));
             socket.close();
         } catch (IOException e) {
             logger.error("Error while closing socket", e);
