@@ -1,20 +1,20 @@
-package me.youhavetrouble.mobrrr.server.game;
+package me.youhavetrouble.mobrrr.server.game.entity.map;
 
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.server.game.entity.Entity;
 import me.youhavetrouble.mobrrr.server.game.entity.EntityTemplate;
 import me.youhavetrouble.mobrrr.server.game.entity.event.EntityRemoveEvent;
 import me.youhavetrouble.mobrrr.server.game.entity.event.EntitySpawnEvent;
+import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.Terrain;
+import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.TerrainComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public abstract class GameMap {
+public abstract class GameMap<T extends TerrainComponent> {
 
     private static final Logger logger = LoggerFactory.getLogger(GameMap.class);
 
@@ -22,13 +22,18 @@ public abstract class GameMap {
 
     private int entityIdCounter = 0;
     private final Map<Integer, Entity<?>> entities = new HashMap<>();
+    public final Terrain<T> terrain;
 
     /**
      * Creates a new game map
      * @param eventDispatcher the event dispatcher to use for events on this map
      */
-    public GameMap(EventDispatcher eventDispatcher) {
+    public GameMap(
+            @NotNull EventDispatcher eventDispatcher,
+            @NotNull Terrain<T> terrain
+    ) {
         this.eventDispatcher = eventDispatcher;
+        this.terrain = terrain;
     }
 
     /**
@@ -59,6 +64,14 @@ public abstract class GameMap {
 
     public final Map<Integer, Entity<?>> getEntities() {
         return Collections.unmodifiableMap(entities);
+    }
+
+    /**
+     * Get the terrain of the map
+     * @return the terrain of the map
+     */
+    public final Terrain<T> getTerrain() {
+        return terrain;
     }
 
     /**

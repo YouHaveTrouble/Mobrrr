@@ -1,7 +1,7 @@
 package me.youhavetrouble.mobrrr.packet.clientbound;
 
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
-import me.youhavetrouble.mobrrr.server.game.PositionWithHeight;
+import me.youhavetrouble.mobrrr.server.game.Position;
 import me.youhavetrouble.mobrrr.server.game.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +11,7 @@ import java.io.IOException;
 public class MoveEntityPacket extends OutgoingPacket {
 
     public final int entityId;
-    private final PositionWithHeight position;
+    private final Position position;
 
     public MoveEntityPacket(@NotNull Entity<?> entity) {
         this.entityId = entity.id;
@@ -26,9 +26,9 @@ public class MoveEntityPacket extends OutgoingPacket {
     @Override
     public void write(DataOutputStream out) throws IOException {
         out.writeInt(entityId);
-        out.writeDouble(position.getX());
-        out.writeDouble(position.getY());
-        out.writeDouble(position.getHeight());
+        out.writeDouble(position.x());
+        out.writeDouble(position.y());
+        out.writeDouble(position.height());
     }
 
 }

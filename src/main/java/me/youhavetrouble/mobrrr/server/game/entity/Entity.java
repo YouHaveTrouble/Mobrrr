@@ -1,7 +1,7 @@
 package me.youhavetrouble.mobrrr.server.game.entity;
 
-import me.youhavetrouble.mobrrr.server.game.GameMap;
-import me.youhavetrouble.mobrrr.server.game.PositionWithHeight;
+import me.youhavetrouble.mobrrr.server.game.entity.map.GameMap;
+import me.youhavetrouble.mobrrr.server.game.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +10,7 @@ public abstract class Entity<T extends EntityTemplate<?>> {
     public final int id;
     public final int typeId;
     public final GameMap gameMap;
-    private PositionWithHeight position;
+    private Position position;
 
     /**
      * This constructor should not be used directly, it's called by {@link EntityTemplate#createEntity(int)} within the
@@ -25,7 +25,7 @@ public abstract class Entity<T extends EntityTemplate<?>> {
             int id,
             int typeId,
             @NotNull GameMap gameMap,
-            @NotNull PositionWithHeight position
+            @NotNull Position position
     ) {
         this.id = id;
         this.typeId = typeId;
@@ -37,11 +37,11 @@ public abstract class Entity<T extends EntityTemplate<?>> {
         return gameMap;
     }
 
-    public PositionWithHeight getPosition() {
+    public Position getPosition() {
         return position;
     }
 
-    public void setPosition(PositionWithHeight position) {
+    public void setPosition(Position position) {
         this.position = position.clone();
     }
 

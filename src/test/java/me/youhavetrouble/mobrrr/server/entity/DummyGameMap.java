@@ -1,9 +1,11 @@
 package me.youhavetrouble.mobrrr.server.entity;
 
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
-import me.youhavetrouble.mobrrr.server.game.GameMap;
+import me.youhavetrouble.mobrrr.server.game.entity.map.GameMap;
+import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.Terrain;
+import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.TerrainComponent;
 
-public class DummyGameMap extends GameMap {
+public class DummyGameMap extends GameMap<TerrainComponent> {
 
     /**
      * Creates a new game map
@@ -11,7 +13,7 @@ public class DummyGameMap extends GameMap {
      * @param eventDispatcher the event dispatcher to use for events on this map
      */
     public DummyGameMap(EventDispatcher eventDispatcher) {
-        super(eventDispatcher);
+        super(eventDispatcher, new Terrain<>(eventDispatcher));
     }
 
 }

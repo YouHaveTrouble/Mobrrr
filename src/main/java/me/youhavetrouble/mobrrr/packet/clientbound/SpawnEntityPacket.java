@@ -1,7 +1,7 @@
 package me.youhavetrouble.mobrrr.packet.clientbound;
 
 import me.youhavetrouble.mobrrr.packet.OutgoingPacket;
-import me.youhavetrouble.mobrrr.server.game.PositionWithHeight;
+import me.youhavetrouble.mobrrr.server.game.Position;
 import me.youhavetrouble.mobrrr.server.game.entity.Entity;
 
 import java.io.DataOutputStream;
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class SpawnEntityPacket extends OutgoingPacket {
 
     public final int entityId, entityTypeId;
-    public final PositionWithHeight position;
+    public final Position position;
     public final byte[] extraData;
 
     public SpawnEntityPacket(Entity<?> entity) {
@@ -32,9 +32,9 @@ public class SpawnEntityPacket extends OutgoingPacket {
     public void write(DataOutputStream out) throws IOException {
         out.writeInt(entityTypeId);
         out.writeInt(entityId);
-        out.writeDouble(position.getX());
-        out.writeDouble(position.getY());
-        out.writeDouble(position.getHeight());
+        out.writeDouble(position.x());
+        out.writeDouble(position.y());
+        out.writeDouble(position.height());
         out.writeInt(extraData.length);
         out.write(extraData);
     }
