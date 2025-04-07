@@ -1,4 +1,4 @@
-package me.youhavetrouble.mobrrr.server.game.entity.map.vision;
+package me.youhavetrouble.mobrrr.server.game.map.vision;
 
 import java.awt.geom.Area;
 import java.util.Collection;

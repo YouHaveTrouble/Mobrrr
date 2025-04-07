@@ -1,12 +1,12 @@
-package me.youhavetrouble.mobrrr.server.game.entity.map;
+package me.youhavetrouble.mobrrr.server.game.map;
 
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
 import me.youhavetrouble.mobrrr.server.game.entity.Entity;
 import me.youhavetrouble.mobrrr.server.game.entity.EntityTemplate;
 import me.youhavetrouble.mobrrr.server.game.entity.event.EntityRemoveEvent;
 import me.youhavetrouble.mobrrr.server.game.entity.event.EntitySpawnEvent;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.Terrain;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.TerrainComponent;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.Terrain;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.TerrainComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -40,11 +40,11 @@ public abstract class GameMap<T extends TerrainComponent> {
      * Spawns an entity on the map and fires {@link EntitySpawnEvent}
      * @param entityTemplate the template of the entity to spawn
      * @return the spawned entity
-     * @param <T> the type of the entity
+     * @param <E> the type of the entity
      */
     @NotNull
-    public final <T extends Entity<?>> T spawnEntity(@NotNull EntityTemplate<T> entityTemplate) {
-        T entity = entityTemplate.createEntity(++entityIdCounter);
+    public final <E extends Entity<?>> E spawnEntity(@NotNull EntityTemplate<E> entityTemplate) {
+        E entity = entityTemplate.createEntity(++entityIdCounter);
         if (entity == null) {
             throw new IllegalArgumentException("Entity template returned null entity");
         }

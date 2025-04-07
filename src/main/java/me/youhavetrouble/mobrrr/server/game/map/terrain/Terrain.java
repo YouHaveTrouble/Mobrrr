@@ -1,8 +1,8 @@
-package me.youhavetrouble.mobrrr.server.game.entity.map.terrain;
+package me.youhavetrouble.mobrrr.server.game.map.terrain;
 
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.event.TerrainAddedEvent;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.event.TerrainRemovedEvent;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.event.TerrainAddedEvent;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.event.TerrainRemovedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.geom.Area;
@@ -64,8 +64,8 @@ public class Terrain<T extends TerrainComponent> extends HashSet<T> {
         if (!totalArea.contains(x, y)) return 0;
         double highestPoint = 0;
         for (TerrainComponent terrainComponent : this) {
-            if (!terrainComponent.getArea().contains(x, y)) continue;
-            highestPoint = Math.max(highestPoint, terrainComponent.getHeight());
+            if (!terrainComponent.area().contains(x, y)) continue;
+            highestPoint = Math.max(highestPoint, terrainComponent.height());
         }
         return highestPoint;
     }
@@ -73,7 +73,7 @@ public class Terrain<T extends TerrainComponent> extends HashSet<T> {
     private void updateTotalArea() {
         totalArea.reset();
         for (TerrainComponent terrainComponent : this) {
-            totalArea.add(terrainComponent.getArea());
+            totalArea.add(terrainComponent.area());
         }
     }
 

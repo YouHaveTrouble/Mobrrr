@@ -1,6 +1,7 @@
 package me.youhavetrouble.mobrrr.server.game.entity;
 
-public abstract class EntityTemplate<T extends Entity<?>> {
+
+public abstract class EntityTemplate<T extends Entity<? extends EntityTemplate<?>>> {
 
     public abstract int getEntityTypeId();
 

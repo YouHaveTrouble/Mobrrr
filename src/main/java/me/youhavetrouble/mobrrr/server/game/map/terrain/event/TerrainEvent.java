@@ -1,7 +1,7 @@
-package me.youhavetrouble.mobrrr.server.game.entity.map.terrain.event;
+package me.youhavetrouble.mobrrr.server.game.map.terrain.event;
 
 import me.youhavetrouble.mobrrr.event.Event;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.TerrainComponent;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.TerrainComponent;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class TerrainEvent<T extends TerrainComponent> extends Event {

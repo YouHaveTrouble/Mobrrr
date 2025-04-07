@@ -1,9 +1,9 @@
 package me.youhavetrouble.mobrrr.server.entity;
 
 import me.youhavetrouble.mobrrr.event.EventDispatcher;
-import me.youhavetrouble.mobrrr.server.game.entity.map.GameMap;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.Terrain;
-import me.youhavetrouble.mobrrr.server.game.entity.map.terrain.TerrainComponent;
+import me.youhavetrouble.mobrrr.server.game.map.GameMap;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.Terrain;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.TerrainComponent;
 
 public class DummyGameMap extends GameMap<TerrainComponent> {
 

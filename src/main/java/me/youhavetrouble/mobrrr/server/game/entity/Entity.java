@@ -1,15 +1,20 @@
 package me.youhavetrouble.mobrrr.server.game.entity;
 
-import me.youhavetrouble.mobrrr.server.game.entity.map.GameMap;
+import me.youhavetrouble.mobrrr.server.game.map.GameMap;
 import me.youhavetrouble.mobrrr.server.game.Position;
+import me.youhavetrouble.mobrrr.server.game.map.terrain.TerrainComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Abstract class for all entities in the game
+ * @param <T> The template class for the entity
+ */
 public abstract class Entity<T extends EntityTemplate<?>> {
 
     public final int id;
     public final int typeId;
-    public final GameMap gameMap;
+    public final GameMap<TerrainComponent> gameMap;
     private Position position;
 
     /**
@@ -24,7 +29,7 @@ public abstract class Entity<T extends EntityTemplate<?>> {
     public Entity(
             int id,
             int typeId,
-            @NotNull GameMap gameMap,
+            @NotNull GameMap<TerrainComponent> gameMap,
             @NotNull Position position
     ) {
         this.id = id;
@@ -33,7 +38,7 @@ public abstract class Entity<T extends EntityTemplate<?>> {
         this.position = position;
     }
 
-    public GameMap getMap() {
+    public GameMap<? extends TerrainComponent> getMap() {
         return gameMap;
     }
 
