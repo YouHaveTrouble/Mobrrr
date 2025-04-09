@@ -29,7 +29,7 @@ public class Vision extends Area {
     }
 
     public boolean isWithin(Observable observable) {
-        if (this.intersects(observable.getVisibleArea().getBounds2D())) return false; // fail fast if not in bounding box
+        if (!this.intersects(observable.getVisibleArea().getBounds2D())) return false; // fail fast if not in bounding box
         Area intersectionArea = new Area(observable.getVisibleArea());
         intersectionArea.intersect(this);
         return !intersectionArea.isEmpty();
