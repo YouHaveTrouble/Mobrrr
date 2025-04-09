@@ -47,14 +47,14 @@ public class Vision extends Area {
         // TODO probably a better LOS check
         for (Observer observer : observers) {
             Point2D observerOrigin = new Point2D.Double(observer.getObserverOrigin().x(), observer.getObserverOrigin().y());
-            Point2D[] observerPoints = new Point2D[4];
-            observerPoints[0] = new Point2D.Double(observableBounds.getMinX(), observableBounds.getMinY());
-            observerPoints[1] = new Point2D.Double(observableBounds.getMinX(), observableBounds.getMaxY());
-            observerPoints[2] = new Point2D.Double(observableBounds.getMaxX(), observableBounds.getMinY());
-            observerPoints[3] = new Point2D.Double(observableBounds.getMaxX(), observableBounds.getMaxY());
+            Point2D[] observablePoints = new Point2D[4];
+            observablePoints[0] = new Point2D.Double(observableBounds.getMinX(), observableBounds.getMinY());
+            observablePoints[1] = new Point2D.Double(observableBounds.getMinX(), observableBounds.getMaxY());
+            observablePoints[2] = new Point2D.Double(observableBounds.getMaxX(), observableBounds.getMinY());
+            observablePoints[3] = new Point2D.Double(observableBounds.getMaxX(), observableBounds.getMaxY());
 
-            // raycast from observer to each  corner of the observable
-            for (Point2D point : observerPoints) {
+            // raycast from observer to each corner of the observable
+            for (Point2D point : observablePoints) {
                 Area obstacleHit = Util.raycast(observerOrigin, point, List.of(terrain.getTotalArea()));
                 if (obstacleHit != null) continue; // hit a wall
                 return true; // spotted!
