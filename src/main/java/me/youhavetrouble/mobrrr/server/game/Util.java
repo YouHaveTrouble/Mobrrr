@@ -25,12 +25,21 @@ public class Util {
             double[] coords = new double[6];
             while (!pathIterator.isDone()) {
                 int type = pathIterator.currentSegment(coords);
-                if (type != PathIterator.SEG_LINETO && type != PathIterator.SEG_MOVETO) continue;
+                if (type != PathIterator.SEG_LINETO && type != PathIterator.SEG_MOVETO) {
+                    pathIterator.next();
+                    continue;
+                }
                 Line2D segment = new Line2D.Double(coords[0], coords[1], coords[2], coords[3]);
                 Point2D intersection = getIntersection(ray, segment);
-                if (intersection == null) continue;
+                if (intersection == null) {
+                    pathIterator.next();
+                    continue;
+                }
                 double distance = start.distanceSq(intersection);
-                if (distance >= closestDistance) continue;
+                if (distance >= closestDistance) {
+                    pathIterator.next();
+                    continue;
+                }
                 closestDistance = distance;
                 closestArea = area;
                 pathIterator.next();
