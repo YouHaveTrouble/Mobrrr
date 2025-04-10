@@ -30,7 +30,7 @@ public class DummyEntity extends Entity<DummyEntityTemplate> implements Observer
     }
 
     @Override
-    public Area getVisibleArea() {
+    public @NotNull Area getVisibleArea() {
         double diameter = observableRadius * 2;
         Ellipse2D.Double circle = new Ellipse2D.Double(
                 getPosition().x() - observableRadius,
