@@ -16,4 +16,14 @@ public class DummyGameMap extends GameMap<TerrainComponent> {
         super(eventDispatcher, new Terrain<>(eventDispatcher));
     }
 
+    /**
+     * Creates a new game map
+     *
+     * @param eventDispatcher the event dispatcher to use for events on this map
+     * @param terrain the terrain of this map
+     */
+    public DummyGameMap(EventDispatcher eventDispatcher, Terrain<TerrainComponent> terrain) {
+        super(eventDispatcher, terrain);
+    }
+
 }
